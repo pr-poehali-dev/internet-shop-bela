@@ -12,6 +12,7 @@ interface Product {
   name: string;
   price: number;
   category: string;
+  brand: string;
   image: string;
   inStock: boolean;
 }
@@ -24,15 +25,32 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [activeSection, setActiveSection] = useState('home');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedBrand, setSelectedBrand] = useState<string>('all');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
 
   const products: Product[] = [
-    { id: 1, name: 'Тормозные колодки', price: 2500, category: 'Тормозная система', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
-    { id: 2, name: 'Масляный фильтр', price: 450, category: 'Фильтры', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
-    { id: 3, name: 'Свечи зажигания (комплект)', price: 1800, category: 'Зажигание', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
-    { id: 4, name: 'Воздушный фильтр', price: 650, category: 'Фильтры', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: false },
-    { id: 5, name: 'Аккумулятор 60Ah', price: 5500, category: 'Электрика', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
-    { id: 6, name: 'Ремень ГРМ', price: 1200, category: 'Двигатель', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 1, name: 'Тормозные колодки', price: 2500, category: 'Тормозная система', brand: 'Brembo', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 2, name: 'Масляный фильтр', price: 450, category: 'Фильтры', brand: 'Mann', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 3, name: 'Свечи зажигания (комплект)', price: 1800, category: 'Зажигание', brand: 'Bosch', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 4, name: 'Воздушный фильтр', price: 650, category: 'Фильтры', brand: 'Mann', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: false },
+    { id: 5, name: 'Аккумулятор 60Ah', price: 5500, category: 'Электрика', brand: 'Varta', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 6, name: 'Ремень ГРМ', price: 1200, category: 'Двигатель', brand: 'Gates', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 7, name: 'Тормозные диски', price: 3200, category: 'Тормозная система', brand: 'Brembo', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 8, name: 'Амортизаторы', price: 4500, category: 'Подвеска', brand: 'Bilstein', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
+    { id: 9, name: 'Топливный фильтр', price: 550, category: 'Фильтры', brand: 'Bosch', image: 'https://cdn.poehali.dev/projects/418923d3-53b0-4a03-976f-0a07af3a002b/files/b9b6c9ca-f7bf-41cb-bc75-8030ad06a9fa.jpg', inStock: true },
   ];
+
+  const categories = ['all', ...Array.from(new Set(products.map(p => p.category)))];
+  const brands = ['all', ...Array.from(new Set(products.map(p => p.brand)))];
+
+  const filteredProducts = products.filter(product => {
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesBrand = selectedBrand === 'all' || product.brand === selectedBrand;
+    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+    const matchesSearch = searchQuery === '' || product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesBrand && matchesPrice && matchesSearch;
+  });
 
   const addToCart = (product: Product) => {
     const existingItem = cartItems.find(item => item.id === product.id);
@@ -244,13 +262,128 @@ const Index = () => {
           <section className="py-16">
             <div className="container mx-auto px-4">
               <h2 className="text-4xl font-bold mb-8">Каталог товаров</h2>
+              
+              <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Icon name="Filter" size={18} />
+                      Категория
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((cat) => (
+                        <Badge
+                          key={cat}
+                          variant={selectedCategory === cat ? 'default' : 'outline'}
+                          className="cursor-pointer"
+                          onClick={() => setSelectedCategory(cat)}
+                        >
+                          {cat === 'all' ? 'Все' : cat}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Icon name="Tag" size={18} />
+                      Бренд
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {brands.map((brand) => (
+                        <Badge
+                          key={brand}
+                          variant={selectedBrand === brand ? 'default' : 'outline'}
+                          className="cursor-pointer"
+                          onClick={() => setSelectedBrand(brand)}
+                        >
+                          {brand === 'all' ? 'Все' : brand}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Icon name="DollarSign" size={18} />
+                      Цена
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          placeholder="От"
+                          value={priceRange[0]}
+                          onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                          className="w-20"
+                        />
+                        <Input
+                          type="number"
+                          placeholder="До"
+                          value={priceRange[1]}
+                          onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                          className="w-20"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">{priceRange[0]} - {priceRange[1]} ₽</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Icon name="Search" size={18} />
+                      Поиск
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Input
+                      placeholder="Название товара"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Найдено товаров: {filteredProducts.length}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setSelectedBrand('all');
+                    setPriceRange([0, 10000]);
+                    setSearchQuery('');
+                  }}
+                >
+                  <Icon name="X" size={16} className="mr-2" />
+                  Сбросить фильтры
+                </Button>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <Card key={product.id} className="hover:shadow-lg transition-shadow hover-scale">
                     <CardHeader>
                       <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-lg mb-4" />
                       <CardTitle>{product.name}</CardTitle>
-                      <CardDescription>{product.category}</CardDescription>
+                      <CardDescription className="flex items-center justify-between">
+                        <span>{product.category}</span>
+                        <Badge variant="secondary">{product.brand}</Badge>
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-center justify-between">
